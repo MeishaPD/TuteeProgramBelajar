@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import brawijaya.example.tuteeprogrambelajar.ui.navigation.Screen
+import brawijaya.example.tuteeprogrambelajar.ui.screens.ruangbelajar.components.KelasCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,6 +88,12 @@ fun RuangBelajarScreen(
                 ),
                 color = Color(0xFF031A2F),
                 modifier = Modifier.padding(bottom = 24.dp)
+            )
+
+            KelasCard(
+                title = "Pemrograman Web",
+                schedule = "Senin, 09:00 - 11:00",
+                onClick = { navController.navigate(Screen.Kelas.route) }
             )
         }
     }

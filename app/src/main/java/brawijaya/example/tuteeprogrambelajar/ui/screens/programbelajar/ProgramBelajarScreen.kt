@@ -238,7 +238,7 @@ fun ProgramBelajarScreen(
                     text = "Hasil Pencarian",
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 20.sp,
                         lineHeight = 20.sp
                     ),
                     color = Color(0xFFCC9215),

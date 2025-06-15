@@ -22,7 +22,7 @@ object ProgrammeRepository {
                 ModuleInfo(
                     "CSS Styling",
                     "Cascading Style Sheets untuk styling dan layout halaman web yang menarik dan responsif.",
-                    listOf("css", "styling", "layout", "responsif", "design", "selector", "property")
+                    listOf("css", "styling", "layout", "responsif", "design", "selector", "property", "responsive")
                 ),
                 ModuleInfo(
                     "JavaScript Fundamentals",
@@ -274,10 +274,9 @@ object ProgrammeRepository {
             return programmeList.map { SearchResult.ProgrammeResult(it) }
         }
 
-        val results = mutableListOf<SearchResult>()
         val searchQuery = query.lowercase().trim()
 
-        programmeList.forEach { programme ->
+        val results = programmeList.flatMap { programme ->
             val programmeMatches = programme.title.contains(searchQuery, ignoreCase = true)
 
             val matchingModules = programme.modules.filter { module ->
@@ -287,41 +286,26 @@ object ProgrammeRepository {
                         module.keywords.any { keyword -> keyword.contains(searchQuery, ignoreCase = true) }
             }
 
-            when {
-                // If programme title matches and there are no specific module matches, show the programme
-                programmeMatches && matchingModules.isEmpty() -> {
-                    results.add(SearchResult.ProgrammeResult(programme))
-                }
-                // If there are matching modules, show each matching module
-                matchingModules.isNotEmpty() -> {
-                    matchingModules.forEach { module ->
-                        results.add(SearchResult.ModuleResult(programme, module))
-                    }
-                }
-                // If programme title matches and there are module matches, show both
-                programmeMatches && matchingModules.isNotEmpty() -> {
-                    results.add(SearchResult.ProgrammeResult(programme))
-                    matchingModules.forEach { module ->
-                        results.add(SearchResult.ModuleResult(programme, module))
-                    }
-                }
+            val programmeResults = if (programmeMatches) listOf(SearchResult.ProgrammeResult(programme)) else emptyList()
+
+            val moduleResults = matchingModules.map { module ->
+                SearchResult.ModuleResult(programme, module)
             }
+
+            programmeResults + moduleResults
         }
 
-        // Remove duplicates and sort by relevance
-        return results.distinctBy { result ->
-            when (result) {
-                is SearchResult.ProgrammeResult -> "programme_${result.programme.id}"
-                is SearchResult.ModuleResult -> "module_${result.programme.id}_${result.module.id}"
+        return results.distinctBy {
+            when (it) {
+                is SearchResult.ProgrammeResult -> "programme_${it.programme.id}"
+                is SearchResult.ModuleResult -> "module_${it.programme.id}_${it.module.id}"
             }
         }.sortedWith(compareBy<SearchResult> { result ->
             when (result) {
                 is SearchResult.ProgrammeResult -> {
-                    // Programme results have higher priority if title matches exactly
                     if (result.programme.title.equals(searchQuery, ignoreCase = true)) 0 else 2
                 }
                 is SearchResult.ModuleResult -> {
-                    // Module results with title match have higher priority than description/keyword matches
                     when {
                         result.module.title.contains(searchQuery, ignoreCase = true) -> 1
                         result.module.keywords.any { it.equals(searchQuery, ignoreCase = true) } -> 3

@@ -80,4 +80,9 @@ class ProgrammeViewModel : ViewModel() {
             ?.modules
             ?.find { it.id == moduleId }
     }
+
+    fun getAllProgrammeModules(programmeId: Int): List<ModuleData> {
+        return _programmeList.find { it.id == programmeId }
+            ?.modules ?: emptyList()
+    }
 }
